@@ -1,19 +1,43 @@
-import { response, request } from "express";
+import bcrypt from "bcryptjs";
+import { request, response } from "express";
+import User from "../models/user.js";
 
-const getUsers = (req = request, res = response) => {
-  const params = req.params;
-  res.json({ msg: "Users Home Page", params });
+const getUsers = async (req = request, res = response) => {
+  const { limit = 5, from = 0 } = req.query;
+  const query = { status: true };
+
+  const [ total, users ] = await Promise.all([
+    User.countDocuments(query),
+    User.find(query).skip(Number(from)).limit(Number(limit))
+  ]);
+
+  res.json({ total, users });
 };
 
-const postUsers = (req = request, res = response) => {
-  const body = req.body;
-  console.log(body);
-  res.json({ msg: "User created" });
+const postUsers = async (req = request, res = response) => {
+  const { name, email, password, role } = req.body;
+  const user = new User({ name, email, password, role });
+
+  // Encrypt password
+  const salt = bcrypt.genSaltSync();
+  user.password = bcrypt.hashSync(password, salt);
+
+  await user.save();
+  res.json({ user });
 };
 
-const putUsers = (req = request, res = response) => {
+const putUsers = async (req = request, res = response) => {
   const id = req.params.id;
-  res.json({ msg: "User updated" });
+  const { password, google, ...rest } = req.body;
+
+  if (password) {
+    // Encrypt password
+    const salt = bcrypt.genSaltSync();
+    rest.password = bcrypt.hashSync(password, salt);
+  }
+
+  const user = await User.findByIdAndUpdate(id, rest);
+  res.json({ user });
 };
 
 const patchUsers = (req = request, res = response) => {
@@ -21,9 +45,10 @@ const patchUsers = (req = request, res = response) => {
   res.json({ msg: "User partially updated" });
 };
 
-const deleteUsers = (req = request, res = response) => {
+const deleteUsers = async (req = request, res = response) => {
   const id = req.params.id;
-  res.json({ msg: "User deleted" });
+  const user = await User.findByIdAndUpdate(id, { status: false });
+  res.json({ user });
 };
 
-export { getUsers, postUsers, putUsers, patchUsers, deleteUsers };
+export { deleteUsers, getUsers, patchUsers, postUsers, putUsers };
