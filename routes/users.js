@@ -7,8 +7,12 @@ import {
   patchUsers,
   deleteUsers,
 } from "../controllers/users.js";
-import { fieldValidator } from "../middlewares/field_validator.js";
-import { isValidRole, emailExists, userIdExists } from "../helpers/db_validations.js";
+import {
+  isValidRole,
+  emailExists,
+  userIdExists,
+} from "../helpers/db_validations.js";
+import { fieldValidator, validateJWT, validateRole } from "../middlewares/index.js";
 
 const router = Router();
 
@@ -43,5 +47,16 @@ router.put(
 
 router.patch("/:id", patchUsers);
 
-router.delete("/:id", deleteUsers);
+router.delete(
+  "/:id",
+  [
+    validateJWT,
+    validateRole,
+    check("id", "Invalid ID").isMongoId(),
+    check("id").custom(userIdExists),
+    fieldValidator,
+  ],
+  deleteUsers
+);
+
 export default router;

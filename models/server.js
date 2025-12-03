@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import usersRouter from "../routes/users.js";
+import authRouter from "../routes/auth.js";
 import { dbConnection } from "../database/config.js";
 
 class Server {
@@ -27,6 +28,7 @@ class Server {
 
   routes() {
     this.app.use("/api/users", usersRouter);
+    this.app.use("/api/auth", authRouter );
   }
 
   listen() {
