@@ -15,7 +15,7 @@ const validateJWT = async (req, res, next) => {
         .status(401)
         .json({ msg: "Invalid token - user does not exist" });
     }
-    res.user = user;
+    req.user = user;
 
     next();
   } catch (error) {
