@@ -49,7 +49,7 @@ const getCategories = async (req = request, res = response) => {
 
 const getCategoryById = async (req = request, res = response) => {
   try {
-    const category = await Category.findById(req.params.id);
+    const category = await Category.findById(req.params.id).populate("user");
     res.json(category);
   } catch (error) {
     console.log(error);

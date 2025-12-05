@@ -3,6 +3,7 @@ import cors from "cors";
 import usersRouter from "../routes/users.js";
 import authRouter from "../routes/auth.js";
 import categoriesRouter from "../routes/categories.js";
+import productsRouter from "../routes/products.js"
 import { dbConnection } from "../database/config.js";
 
 class Server {
@@ -31,6 +32,7 @@ class Server {
     this.app.use("/api/users", usersRouter);
     this.app.use("/api/auth", authRouter );
     this.app.use("/api/categories", categoriesRouter );
+    this.app.use("/api/products", productsRouter );
   }
 
   listen() {
