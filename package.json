@@ -21,6 +21,7 @@
     "google-auth-library": "^10.5.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^9.0.0",
+    "socket.io": "^4.8.1",
     "uuidv4": "^6.2.13"
   },
   "devDependencies": {

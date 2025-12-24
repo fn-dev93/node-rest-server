@@ -8,14 +8,20 @@ import searchRouter from "../routes/search.js";
 import uploadsRouter from "../routes/uploads.js";
 import fileUpload from "express-fileupload";
 import { dbConnection } from "../database/config.js";
+import { Server as SocketIOServer } from "socket.io";
+import http from "http";
+import socketController from "../sockets/socker_controller.js";
 
 class Server {
   constructor() {
     this.app = express();
     this.port = process.env.PORT || 3000;
+    this.server = http.createServer(this.app);
+    this.io = new SocketIOServer(this.server);
     this.databaseConnection();
     this.middlewares();
     this.routes();
+    this.sockets();
   }
 
   async databaseConnection() {
@@ -48,8 +54,12 @@ class Server {
     this.app.use("/api/uploads", uploadsRouter);
   }
 
+  sockets() {
+    this.io.on("connection", (socket) => socketController(socket, this.io));
+  }
+
   listen() {
-    this.app.listen(this.port, () => {
+    this.server.listen(this.port, () => {
       console.log(`Server running on port ${this.port}`);
     });
   }

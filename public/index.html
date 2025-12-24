@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Google Sign In</title>
     <style>
       body {
@@ -12,6 +12,42 @@
         flex-direction: column;
         align-items: center;
         gap: 20px;
+      }
+
+      .form-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        max-width: 400px;
+        margin-top: 30px;
+      }
+
+      #formLogin {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      input {
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      #btn_login {
+        padding: 12px 24px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      #btn_login:hover {
+        background-color: #0056b3;
       }
 
       #sign_out {
@@ -29,59 +65,10 @@
         background-color: #c82333;
       }
     </style>
-    <script src="https://accounts.google.com/gsi/client" async></script>
-
-    <script>
-      function decodeJWT(token) {
-
-        let base64Url = token.split(".")[1];
-        let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-        let jsonPayload = decodeURIComponent(
-          atob(base64)
-            .split("")
-            .map(function (c) {
-              return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-            })
-            .join("")
-        );
-        return JSON.parse(jsonPayload);
-      }
-
-      function handleCredentialResponse(response) {
-        const body = { id_token: response.credential };
-        fetch('http://localhost:8080/api/auth/google', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ id_token: response.credential })
-        }).then(res => res.json(body))
-          .then(data => {
-            console.log(data);
-            localStorage.setItem('email', data.user.email);
-          }).catch(err => {
-            console.error('Error:', err);
-          });
-      }
-
-      window.onload = function() {
-        const signOutButton = document.getElementById("sign_out");
-        signOutButton.onclick = () => {
-            const email = localStorage.getItem('email');
-            console.log(email);
-            google.accounts.id.disableAutoSelect();
-    
-            localStorage.removeItem('email');
-            console.log('User signed out.');
-            localStorage.clear();
-            location.reload();
-        };
-      }
-    </script>
   </head>
   <body>
     <h1>Google Sign In Demo</h1>
-    
+
     <!-- g_id_onload contains Google Identity Services settings -->
     <div
       id="g_id_onload"
@@ -89,9 +76,9 @@
       data-callback="handleCredentialResponse"
       data-client_id="534483056678-jsqs5dsehpkh6j82jbiso0h9ate20d1i.apps.googleusercontent.com"
     ></div>
-    
+
     <!-- g_id_signin places the button on a page and supports customization -->
-    <div 
+    <div
       class="g_id_signin"
       data-type="standard"
       data-size="large"
@@ -100,7 +87,21 @@
       data-shape="rectangular"
       data-logo_alignment="left"
     ></div>
-    
+
     <button id="sign_out">Sign Out</button>
+
+    <div class="form-container">
+      <h1>Login</h1>
+      <form id="formLogin" action="">
+        <input type="text" name="email" class="form-control mb-2" id="txt_email" placeholder="Email" />
+        <input type="password" name="password" class="form-control mb-2" id="txt_password" placeholder="Password" />
+        <button type="submit" class="btn btn-primary" id="btn_login">
+          Login
+        </button>
+      </form>
+    </div>
+
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <script src="js/auth.js"></script>
   </body>
 </html>

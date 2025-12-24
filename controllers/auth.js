@@ -1,7 +1,7 @@
 import { request, response } from "express";
 import bcrypt from "bcryptjs";
 import User from "../models/user.js";
-import generateJWT from "../helpers/generate_jwt.js";
+import {generateJWT} from "../helpers/generate_jwt.js";
 import googleVerify from "../helpers/google_validator.js";
 
 const login = async (req = request, res = response) => {
@@ -70,4 +70,10 @@ const googleSignIn = async (req, res = response) => {
   }
 };
 
-export { login, googleSignIn };
+const refreshJWT = async (req, res = response) => {
+  const { user } = req;
+  const token = await generateJWT(user.id);
+  res.json({ user, token });
+};
+
+export { login, googleSignIn, refreshJWT };
